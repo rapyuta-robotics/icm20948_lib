@@ -118,7 +118,22 @@ ICM_20948_Status_e ICM_20948_init_struct(ICM_20948_Device_t* pdev) {
     // Initialize all elements by 0 except for _last_bank
     // Initialize _last_bank to 4 (invalid bank number)
     // so ICM_20948_set_bank function does not skip issuing bank change operation
-    static const ICM_20948_Device_t init_device = {._last_bank = 4};
+    static const ICM_20948_Device_t init_device = {._serif = nullptr,
+            ._dmp_firmware_available = false,
+            ._firmware_loaded = false,
+            ._last_bank = 4,
+            ._last_mems_bank = 0,
+            ._gyroSF = 0,
+            ._gyroSFpll = 0,
+            ._enabled_Android_0 = 0,
+            ._enabled_Android_1 = 0,
+            ._enabled_Android_intr_0 = 0,
+            ._enabled_Android_intr_1 = 0,
+            ._dataOutCtl1 = 0,
+            ._dataOutCtl2 = 0,
+            ._dataRdyStatus = 0,
+            ._motionEventCtl = 0,
+            ._dataIntrCtl = 0};
     *pdev = init_device;
     return ICM_20948_Stat_Ok;
 }
