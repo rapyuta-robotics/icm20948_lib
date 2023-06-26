@@ -919,7 +919,13 @@ ICM_20948_Status_e ICM_20948_get_agmt(ICM_20948_Device_t* pdev, ICM_20948_AGMT_t
 
     // Get readings
     retval = ICM_20948_set_bank(pdev, 0);
+    if (retval != ICM_20948_Stat_Ok) {
+        return retval;
+    }
     retval = ICM_20948_execute_r(pdev, (uint8_t) AGB0_REG_ACCEL_XOUT_H, buff, numbytes);
+    if (retval != ICM_20948_Stat_Ok) {
+        return retval;
+    }
 
     pagmt->acc.axes.x = ((buff[0] << 8) | (buff[1] & 0xFF));
     pagmt->acc.axes.y = ((buff[2] << 8) | (buff[3] & 0xFF));
@@ -939,16 +945,28 @@ ICM_20948_Status_e ICM_20948_get_agmt(ICM_20948_Device_t* pdev, ICM_20948_AGMT_t
 
     // Get settings to be able to compute scaled values
     retval = ICM_20948_set_bank(pdev, 2);
+    if (retval != ICM_20948_Stat_Ok) {
+        return retval;
+    }
     ICM_20948_ACCEL_CONFIG_t acfg;
     retval = ICM_20948_execute_r(pdev, (uint8_t) AGB2_REG_ACCEL_CONFIG, (uint8_t*) &acfg, 1 * sizeof(acfg));
+    if (retval != ICM_20948_Stat_Ok) {
+        return retval;
+    }
     pagmt->fss.a =
             acfg.ACCEL_FS_SEL;  // Worth noting that without explicitly setting the FS range of the accelerometer it was
                                 // showing the register value for +/- 2g but the reported values were actually scaled to
                                 // the +/- 16g range Wait a minute... now it seems like this problem actually comes from
                                 // the digital low-pass filter. When enabled the value is 1/8 what it should be...
     retval = ICM_20948_set_bank(pdev, 2);
+    if (retval != ICM_20948_Stat_Ok) {
+        return retval;
+    }
     ICM_20948_GYRO_CONFIG_1_t gcfg1;
     retval = ICM_20948_execute_r(pdev, (uint8_t) AGB2_REG_GYRO_CONFIG_1, (uint8_t*) &gcfg1, 1 * sizeof(gcfg1));
+    if (retval != ICM_20948_Stat_Ok) {
+        return retval;
+    }
     pagmt->fss.g = gcfg1.GYRO_FS_SEL;
     ICM_20948_ACCEL_CONFIG_2_t acfg2;
     retval = ICM_20948_execute_r(pdev, (uint8_t) AGB2_REG_ACCEL_CONFIG_2, (uint8_t*) &acfg2, 1 * sizeof(acfg2));
@@ -978,9 +996,7 @@ ICM_20948_Status_e ICM_20948_enable_FIFO(ICM_20948_Device_t* pdev, bool enable) 
         ctrl.FIFO_EN = 0;
 
     retval = ICM_20948_execute_w(pdev, AGB0_REG_USER_CTRL, (uint8_t*) &ctrl, sizeof(ICM_20948_USER_CTRL_t));
-    if (retval != ICM_20948_Stat_Ok) {
-        return retval;
-    }
+
     return retval;
 }
 
@@ -1010,9 +1026,6 @@ ICM_20948_Status_e ICM_20948_reset_FIFO(ICM_20948_Device_t* pdev) {
     ctrl.FIFO_RESET = 0x1E;  // The InvenSense Nucleo examples write 0x1F followed by 0x1E
 
     retval = ICM_20948_execute_w(pdev, AGB0_REG_FIFO_RST, (uint8_t*) &ctrl, sizeof(ICM_20948_FIFO_RST_t));
-    if (retval != ICM_20948_Stat_Ok) {
-        return retval;
-    }
 
     return retval;
 }
@@ -1037,9 +1050,7 @@ ICM_20948_Status_e ICM_20948_set_FIFO_mode(ICM_20948_Device_t* pdev, bool snapsh
         ctrl.FIFO_MODE = 0;
 
     retval = ICM_20948_execute_w(pdev, AGB0_REG_FIFO_MODE, (uint8_t*) &ctrl, sizeof(ICM_20948_FIFO_MODE_t));
-    if (retval != ICM_20948_Stat_Ok) {
-        return retval;
-    }
+
     return retval;
 }
 
@@ -1079,9 +1090,6 @@ ICM_20948_Status_e ICM_20948_read_FIFO(ICM_20948_Device_t* pdev, uint8_t* data, 
     }
 
     retval = ICM_20948_execute_r(pdev, AGB0_REG_FIFO_R_W, data, len);
-    if (retval != ICM_20948_Stat_Ok) {
-        return retval;
-    }
 
     return retval;
 }
@@ -1108,9 +1116,7 @@ ICM_20948_Status_e ICM_20948_enable_DMP(ICM_20948_Device_t* pdev, bool enable) {
         ctrl.DMP_EN = 0;
 
     retval = ICM_20948_execute_w(pdev, AGB0_REG_USER_CTRL, (uint8_t*) &ctrl, sizeof(ICM_20948_USER_CTRL_t));
-    if (retval != ICM_20948_Stat_Ok) {
-        return retval;
-    }
+
     return retval;
 }
 
@@ -1131,9 +1137,7 @@ ICM_20948_Status_e ICM_20948_reset_DMP(ICM_20948_Device_t* pdev) {
     ctrl.DMP_RST = 1;
 
     retval = ICM_20948_execute_w(pdev, AGB0_REG_USER_CTRL, (uint8_t*) &ctrl, sizeof(ICM_20948_USER_CTRL_t));
-    if (retval != ICM_20948_Stat_Ok) {
-        return retval;
-    }
+
     return retval;
 }
 
