@@ -1989,6 +1989,8 @@ ICM_20948_Status_e ICM_20948_read_I2C(uint8_t reg, uint8_t *buff, uint32_t len,
 }
 
 ICM_20948_Status_e ICM_20948_SPI::begin(const char *device, uint32_t speed) {
+  _speed = speed;
+  
   _spi_fd = open(device, O_RDWR);
   if (_spi_fd < 0) {
     perror("Failed to open SPI device");
@@ -1997,7 +1999,6 @@ ICM_20948_Status_e ICM_20948_SPI::begin(const char *device, uint32_t speed) {
 
   uint8_t mode = SPI_MODE_0;
   uint8_t bits = 8;
-  // uint32_t speed = 1000000; // 1 MHz
   char lsbfirst = 0;
 
   if (ioctl(_spi_fd, SPI_IOC_RD_MODE, &mode) < 0) {
@@ -2076,7 +2077,7 @@ ICM_20948_Status_e ICM_20948_SPI::begin(const char *device, uint32_t speed) {
   // startupDefault(false) manually if required.
   status = startupDefault(_device._dmp_firmware_available);
   if (status != ICM_20948_Stat_Ok) {
-    debugPrint(("ICM_20948_I2C::begin: startupDefault returned: "));
+    debugPrint(("ICM_20948_SPI::begin: startupDefault returned: "));
     debugPrintStatus(status);
     debugPrintln((""));
   }
