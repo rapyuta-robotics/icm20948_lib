@@ -114,7 +114,7 @@ const ICM_20948_Serif_t NullSerif = {
 // Private function prototypes
 
 // Function definitions
-ICM_20948_Status_e ICM_20948_init_struct(ICM_20948_Device_t* pdev) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_init_struct(ICM_20948_Device_t* pdev) {
     // Initialize all elements by 0 except for _last_bank
     // Initialize _last_bank to 4 (invalid bank number)
     // so ICM_20948_set_bank function does not skip issuing bank change operation
@@ -138,7 +138,8 @@ ICM_20948_Status_e ICM_20948_init_struct(ICM_20948_Device_t* pdev) {
     return ICM_20948_Stat_Ok;
 }
 
-ICM_20948_Status_e ICM_20948_link_serif(ICM_20948_Device_t* pdev, const ICM_20948_Serif_t* s) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_link_serif(
+        ICM_20948_Device_t* pdev, const ICM_20948_Serif_t* s) {
     if (s == NULL) {
         return ICM_20948_Stat_ParamErr;
     }
@@ -149,14 +150,16 @@ ICM_20948_Status_e ICM_20948_link_serif(ICM_20948_Device_t* pdev, const ICM_2094
     return ICM_20948_Stat_Ok;
 }
 
-ICM_20948_Status_e ICM_20948_execute_w(ICM_20948_Device_t* pdev, uint8_t regaddr, uint8_t* pdata, uint32_t len) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_execute_w(
+        ICM_20948_Device_t* pdev, uint8_t regaddr, uint8_t* pdata, uint32_t len) {
     if (pdev->_serif->write == NULL) {
         return ICM_20948_Stat_NotImpl;
     }
     return (*pdev->_serif->write)(regaddr, pdata, len, pdev->_serif->user);
 }
 
-ICM_20948_Status_e ICM_20948_execute_r(ICM_20948_Device_t* pdev, uint8_t regaddr, uint8_t* pdata, uint32_t len) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_execute_r(
+        ICM_20948_Device_t* pdev, uint8_t regaddr, uint8_t* pdata, uint32_t len) {
     if (pdev->_serif->read == NULL) {
         return ICM_20948_Stat_NotImpl;
     }
@@ -165,7 +168,7 @@ ICM_20948_Status_e ICM_20948_execute_r(ICM_20948_Device_t* pdev, uint8_t regaddr
 
 // Transact directly with an I2C device, one byte at a time
 // Used to configure a device before it is setup into a normal 0-3 peripheral slot
-ICM_20948_Status_e ICM_20948_i2c_controller_periph4_txn(
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_i2c_controller_periph4_txn(
         ICM_20948_Device_t* pdev, uint8_t addr, uint8_t reg, uint8_t* data, uint8_t len, bool Rw, bool send_reg_addr) {
     // Thanks MikeFair! // https://github.com/kriswiner/MPU9250/issues/86
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
@@ -244,15 +247,17 @@ ICM_20948_Status_e ICM_20948_i2c_controller_periph4_txn(
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_i2c_master_single_w(ICM_20948_Device_t* pdev, uint8_t addr, uint8_t reg, uint8_t* data) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_i2c_master_single_w(
+        ICM_20948_Device_t* pdev, uint8_t addr, uint8_t reg, uint8_t* data) {
     return ICM_20948_i2c_controller_periph4_txn(pdev, addr, reg, data, 1, false, true);
 }
 
-ICM_20948_Status_e ICM_20948_i2c_master_single_r(ICM_20948_Device_t* pdev, uint8_t addr, uint8_t reg, uint8_t* data) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_i2c_master_single_r(
+        ICM_20948_Device_t* pdev, uint8_t addr, uint8_t reg, uint8_t* data) {
     return ICM_20948_i2c_controller_periph4_txn(pdev, addr, reg, data, 1, true, true);
 }
 
-ICM_20948_Status_e ICM_20948_set_bank(ICM_20948_Device_t* pdev, uint8_t bank) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_set_bank(ICM_20948_Device_t* pdev, uint8_t bank) {
     if (bank > 3) {
         return ICM_20948_Stat_ParamErr;
     }  // Only 4 possible banks
@@ -265,7 +270,7 @@ ICM_20948_Status_e ICM_20948_set_bank(ICM_20948_Device_t* pdev, uint8_t bank) {
     return ICM_20948_execute_w(pdev, REG_BANK_SEL, &bank, 1);
 }
 
-ICM_20948_Status_e ICM_20948_sw_reset(ICM_20948_Device_t* pdev) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_sw_reset(ICM_20948_Device_t* pdev) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
     ICM_20948_PWR_MGMT_1_t reg;
 
@@ -285,7 +290,7 @@ ICM_20948_Status_e ICM_20948_sw_reset(ICM_20948_Device_t* pdev) {
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_sleep(ICM_20948_Device_t* pdev, bool on) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_sleep(ICM_20948_Device_t* pdev, bool on) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
     ICM_20948_PWR_MGMT_1_t reg;
 
@@ -309,7 +314,7 @@ ICM_20948_Status_e ICM_20948_sleep(ICM_20948_Device_t* pdev, bool on) {
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_low_power(ICM_20948_Device_t* pdev, bool on) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_low_power(ICM_20948_Device_t* pdev, bool on) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
     ICM_20948_PWR_MGMT_1_t reg;
 
@@ -333,7 +338,8 @@ ICM_20948_Status_e ICM_20948_low_power(ICM_20948_Device_t* pdev, bool on) {
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_set_clock_source(ICM_20948_Device_t* pdev, ICM_20948_PWR_MGMT_1_CLKSEL_e source) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_set_clock_source(
+        ICM_20948_Device_t* pdev, ICM_20948_PWR_MGMT_1_CLKSEL_e source) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
     ICM_20948_PWR_MGMT_1_t reg;
 
@@ -353,7 +359,8 @@ ICM_20948_Status_e ICM_20948_set_clock_source(ICM_20948_Device_t* pdev, ICM_2094
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_get_who_am_i(ICM_20948_Device_t* pdev, uint8_t* whoami) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_get_who_am_i(
+        ICM_20948_Device_t* pdev, uint8_t* whoami) {
     if (whoami == NULL) {
         return ICM_20948_Stat_ParamErr;
     }
@@ -361,7 +368,7 @@ ICM_20948_Status_e ICM_20948_get_who_am_i(ICM_20948_Device_t* pdev, uint8_t* who
     return ICM_20948_execute_r(pdev, AGB0_REG_WHO_AM_I, whoami, 1);
 }
 
-ICM_20948_Status_e ICM_20948_check_id(ICM_20948_Device_t* pdev) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_check_id(ICM_20948_Device_t* pdev) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
     uint8_t whoami = 0x00;
     retval = ICM_20948_get_who_am_i(pdev, &whoami);
@@ -374,7 +381,7 @@ ICM_20948_Status_e ICM_20948_check_id(ICM_20948_Device_t* pdev) {
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_data_ready(ICM_20948_Device_t* pdev) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_data_ready(ICM_20948_Device_t* pdev) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
     ICM_20948_INT_STATUS_1_t reg;
     retval = ICM_20948_set_bank(pdev, 0);  // Must be in the right bank
@@ -392,7 +399,7 @@ ICM_20948_Status_e ICM_20948_data_ready(ICM_20948_Device_t* pdev) {
 }
 
 // Interrupt Configuration
-ICM_20948_Status_e ICM_20948_int_pin_cfg(
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_int_pin_cfg(
         ICM_20948_Device_t* pdev, ICM_20948_INT_PIN_CFG_t* write, ICM_20948_INT_PIN_CFG_t* read) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
     retval = ICM_20948_set_bank(pdev, 0);  // Must be in the right bank
@@ -411,7 +418,7 @@ ICM_20948_Status_e ICM_20948_int_pin_cfg(
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_int_enable(
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_int_enable(
         ICM_20948_Device_t* pdev, ICM_20948_INT_enable_t* write, ICM_20948_INT_enable_t* read) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
@@ -502,7 +509,7 @@ ICM_20948_Status_e ICM_20948_int_enable(
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_wom_threshold(
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_wom_threshold(
         ICM_20948_Device_t* pdev, ICM_20948_ACCEL_WOM_THR_t* write, ICM_20948_ACCEL_WOM_THR_t* read) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
@@ -532,7 +539,7 @@ ICM_20948_Status_e ICM_20948_wom_threshold(
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_set_sample_mode(
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_set_sample_mode(
         ICM_20948_Device_t* pdev, ICM_20948_InternalSensorID_bm sensors, ICM_20948_LP_CONFIG_CYCLE_e mode) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
     ICM_20948_LP_CONFIG_t reg;
@@ -586,7 +593,7 @@ ICM_20948_Status_e ICM_20948_set_sample_mode(
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_set_full_scale(
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_set_full_scale(
         ICM_20948_Device_t* pdev, ICM_20948_InternalSensorID_bm sensors, ICM_20948_fss_t fss) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
@@ -619,7 +626,7 @@ ICM_20948_Status_e ICM_20948_set_full_scale(
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_set_dlpf_cfg(
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_set_dlpf_cfg(
         ICM_20948_Device_t* pdev, ICM_20948_InternalSensorID_bm sensors, ICM_20948_dlpcfg_t cfg) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
@@ -652,7 +659,8 @@ ICM_20948_Status_e ICM_20948_set_dlpf_cfg(
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_enable_dlpf(ICM_20948_Device_t* pdev, ICM_20948_InternalSensorID_bm sensors, bool enable) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_enable_dlpf(
+        ICM_20948_Device_t* pdev, ICM_20948_InternalSensorID_bm sensors, bool enable) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
     if (!(sensors & (ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr))) {
@@ -702,7 +710,7 @@ ICM_20948_Status_e ICM_20948_enable_dlpf(ICM_20948_Device_t* pdev, ICM_20948_Int
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_set_sample_rate(
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_set_sample_rate(
         ICM_20948_Device_t* pdev, ICM_20948_InternalSensorID_bm sensors, ICM_20948_smplrt_t smplrt) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
@@ -726,7 +734,8 @@ ICM_20948_Status_e ICM_20948_set_sample_rate(
 }
 
 // Interface Things
-ICM_20948_Status_e ICM_20948_i2c_master_passthrough(ICM_20948_Device_t* pdev, bool passthrough) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_i2c_master_passthrough(
+        ICM_20948_Device_t* pdev, bool passthrough) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
     ICM_20948_INT_PIN_CFG_t reg;
@@ -747,7 +756,8 @@ ICM_20948_Status_e ICM_20948_i2c_master_passthrough(ICM_20948_Device_t* pdev, bo
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_i2c_master_enable(ICM_20948_Device_t* pdev, bool enable) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_i2c_master_enable(
+        ICM_20948_Device_t* pdev, bool enable) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
     // Disable BYPASS_EN
@@ -794,7 +804,7 @@ ICM_20948_Status_e ICM_20948_i2c_master_enable(ICM_20948_Device_t* pdev, bool en
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_i2c_master_reset(ICM_20948_Device_t* pdev) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_i2c_master_reset(ICM_20948_Device_t* pdev) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
     ICM_20948_USER_CTRL_t ctrl;
@@ -817,9 +827,9 @@ ICM_20948_Status_e ICM_20948_i2c_master_reset(ICM_20948_Device_t* pdev) {
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_i2c_controller_configure_peripheral(ICM_20948_Device_t* pdev, uint8_t peripheral,
-        uint8_t addr, uint8_t reg, uint8_t len, bool Rw, bool enable, bool data_only, bool grp, bool swap,
-        uint8_t dataOut) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_i2c_controller_configure_peripheral(
+        ICM_20948_Device_t* pdev, uint8_t peripheral, uint8_t addr, uint8_t reg, uint8_t len, bool Rw, bool enable,
+        bool data_only, bool grp, bool swap, uint8_t dataOut) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
     uint8_t periph_addr_reg;
@@ -908,7 +918,8 @@ ICM_20948_Status_e ICM_20948_i2c_controller_configure_peripheral(ICM_20948_Devic
 }
 
 // Higher Level
-ICM_20948_Status_e ICM_20948_get_agmt(ICM_20948_Device_t* pdev, ICM_20948_AGMT_t* pagmt) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_get_agmt(
+        ICM_20948_Device_t* pdev, ICM_20948_AGMT_t* pagmt) {
     if (pagmt == NULL) {
         return ICM_20948_Stat_ParamErr;
     }
@@ -976,7 +987,8 @@ ICM_20948_Status_e ICM_20948_get_agmt(ICM_20948_Device_t* pdev, ICM_20948_AGMT_t
 
 // FIFO
 
-ICM_20948_Status_e ICM_20948_enable_FIFO(ICM_20948_Device_t* pdev, bool enable) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_enable_FIFO(
+        ICM_20948_Device_t* pdev, bool enable) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
     ICM_20948_USER_CTRL_t ctrl;
@@ -1000,7 +1012,7 @@ ICM_20948_Status_e ICM_20948_enable_FIFO(ICM_20948_Device_t* pdev, bool enable) 
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_reset_FIFO(ICM_20948_Device_t* pdev) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_reset_FIFO(ICM_20948_Device_t* pdev) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
     ICM_20948_FIFO_RST_t ctrl;
@@ -1030,7 +1042,8 @@ ICM_20948_Status_e ICM_20948_reset_FIFO(ICM_20948_Device_t* pdev) {
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_set_FIFO_mode(ICM_20948_Device_t* pdev, bool snapshot) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_set_FIFO_mode(
+        ICM_20948_Device_t* pdev, bool snapshot) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
     ICM_20948_FIFO_MODE_t ctrl;
@@ -1054,7 +1067,8 @@ ICM_20948_Status_e ICM_20948_set_FIFO_mode(ICM_20948_Device_t* pdev, bool snapsh
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_get_FIFO_count(ICM_20948_Device_t* pdev, uint16_t* count) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_get_FIFO_count(
+        ICM_20948_Device_t* pdev, uint16_t* count) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
     ICM_20948_FIFO_COUNTH_t ctrlh;
@@ -1081,7 +1095,8 @@ ICM_20948_Status_e ICM_20948_get_FIFO_count(ICM_20948_Device_t* pdev, uint16_t* 
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_read_FIFO(ICM_20948_Device_t* pdev, uint8_t* data, uint8_t len) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_read_FIFO(
+        ICM_20948_Device_t* pdev, uint8_t* data, uint8_t len) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
     retval = ICM_20948_set_bank(pdev, 0);
@@ -1096,7 +1111,7 @@ ICM_20948_Status_e ICM_20948_read_FIFO(ICM_20948_Device_t* pdev, uint8_t* data, 
 
 // DMP
 
-ICM_20948_Status_e ICM_20948_enable_DMP(ICM_20948_Device_t* pdev, bool enable) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_enable_DMP(ICM_20948_Device_t* pdev, bool enable) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
     ICM_20948_USER_CTRL_t ctrl;
@@ -1120,7 +1135,7 @@ ICM_20948_Status_e ICM_20948_enable_DMP(ICM_20948_Device_t* pdev, bool enable) {
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_reset_DMP(ICM_20948_Device_t* pdev) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_reset_DMP(ICM_20948_Device_t* pdev) {
     ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
 
     ICM_20948_USER_CTRL_t ctrl;
@@ -1141,7 +1156,7 @@ ICM_20948_Status_e ICM_20948_reset_DMP(ICM_20948_Device_t* pdev) {
     return retval;
 }
 
-ICM_20948_Status_e ICM_20948_firmware_load(ICM_20948_Device_t* pdev) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_firmware_load(ICM_20948_Device_t* pdev) {
 #if defined(ICM_20948_USE_DMP)
     return (inv_icm20948_firmware_load(pdev, dmp3_image, sizeof(dmp3_image), DMP_LOAD_START));
 #else
@@ -1155,8 +1170,8 @@ ICM_20948_Status_e ICM_20948_firmware_load(ICM_20948_Device_t* pdev) {
  * @param[in] load_addr  address to loading the image
  * @return 0 in case of success, -1 for any error
  */
-ICM_20948_Status_e inv_icm20948_firmware_load(ICM_20948_Device_t* pdev, const unsigned char* data_start,
-        unsigned short size_start, unsigned short load_addr) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e inv_icm20948_firmware_load(ICM_20948_Device_t* pdev,
+        const unsigned char* data_start, unsigned short size_start, unsigned short load_addr) {
     int write_size;
     ICM_20948_Status_e result = ICM_20948_Stat_Ok;
     unsigned short memaddr;
@@ -1255,7 +1270,8 @@ ICM_20948_Status_e inv_icm20948_firmware_load(ICM_20948_Device_t* pdev, const un
     return result;
 }
 
-ICM_20948_Status_e ICM_20948_set_dmp_start_address(ICM_20948_Device_t* pdev, unsigned short address) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e ICM_20948_set_dmp_start_address(
+        ICM_20948_Device_t* pdev, unsigned short address) {
     ICM_20948_Status_e result = ICM_20948_Stat_Ok;
 
     if (pdev->_dmp_firmware_available == false)
@@ -1296,7 +1312,7 @@ ICM_20948_Status_e ICM_20948_set_dmp_start_address(ICM_20948_Device_t* pdev, uns
  *  @param[out]  output data from the register
  *  @return     0 if successful.
  */
-ICM_20948_Status_e inv_icm20948_write_mems(
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e inv_icm20948_write_mems(
         ICM_20948_Device_t* pdev, unsigned short reg, unsigned int length, const unsigned char* data) {
     ICM_20948_Status_e result = ICM_20948_Stat_Ok;
     unsigned int bytesWritten = 0;
@@ -1363,7 +1379,7 @@ ICM_20948_Status_e inv_icm20948_write_mems(
  *  @param[in]  input data from the register
  *  @return     0 if successful.
  */
-ICM_20948_Status_e inv_icm20948_read_mems(
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e inv_icm20948_read_mems(
         ICM_20948_Device_t* pdev, unsigned short reg, unsigned int length, unsigned char* data) {
     ICM_20948_Status_e result = ICM_20948_Stat_Ok;
     unsigned int bytesRead = 0;
@@ -1423,7 +1439,7 @@ ICM_20948_Status_e inv_icm20948_read_mems(
     return result;
 }
 
-ICM_20948_Status_e inv_icm20948_set_dmp_sensor_period(
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e inv_icm20948_set_dmp_sensor_period(
         ICM_20948_Device_t* pdev, enum DMP_ODR_Registers odr_reg, uint16_t interval) {
     // Set the ODR registers and clear the ODR counter
 
@@ -1516,7 +1532,7 @@ ICM_20948_Status_e inv_icm20948_set_dmp_sensor_period(
     return result;
 }
 
-ICM_20948_Status_e inv_icm20948_enable_dmp_sensor(
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e inv_icm20948_enable_dmp_sensor(
         ICM_20948_Device_t* pdev, enum inv_icm20948_sensor sensor, int state) {
     ICM_20948_Status_e result = ICM_20948_Stat_Ok;
 
@@ -1675,7 +1691,7 @@ ICM_20948_Status_e inv_icm20948_enable_dmp_sensor(
     return result;
 }
 
-ICM_20948_Status_e inv_icm20948_enable_dmp_sensor_int(
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e inv_icm20948_enable_dmp_sensor_int(
         ICM_20948_Device_t* pdev, enum inv_icm20948_sensor sensor, int state) {
     ICM_20948_Status_e result = ICM_20948_Stat_Ok;
 
@@ -1759,7 +1775,8 @@ ICM_20948_Status_e inv_icm20948_enable_dmp_sensor_int(
     return result;
 }
 
-ICM_20948_Status_e inv_icm20948_read_dmp_data(ICM_20948_Device_t* pdev, icm_20948_DMP_data_t* data) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e inv_icm20948_read_dmp_data(
+        ICM_20948_Device_t* pdev, icm_20948_DMP_data_t* data) {
     ICM_20948_Status_e result = ICM_20948_Stat_Ok;
     uint8_t fifoBytes[icm_20948_DMP_Maximum_Bytes];  // Interim storage for the FIFO data
 
@@ -2232,7 +2249,7 @@ ICM_20948_Status_e inv_icm20948_read_dmp_data(ICM_20948_Device_t* pdev, icm_2094
     return result;
 }
 
-uint8_t sensor_type_2_android_sensor(enum inv_icm20948_sensor sensor) {
+__attribute__((no_sanitize("address"))) uint8_t sensor_type_2_android_sensor(enum inv_icm20948_sensor sensor) {
     switch (sensor) {
         case INV_ICM20948_SENSOR_ACCELEROMETER:
             return ANDROID_SENSOR_ACCELEROMETER;  // 1
@@ -2279,7 +2296,7 @@ uint8_t sensor_type_2_android_sensor(enum inv_icm20948_sensor sensor) {
     }
 }
 
-enum inv_icm20948_sensor inv_icm20948_sensor_android_2_sensor_type(int sensor) {
+__attribute__((no_sanitize("address"))) enum inv_icm20948_sensor inv_icm20948_sensor_android_2_sensor_type(int sensor) {
     switch (sensor) {
         case ANDROID_SENSOR_ACCELEROMETER:
             return INV_ICM20948_SENSOR_ACCELEROMETER;
@@ -2326,7 +2343,8 @@ enum inv_icm20948_sensor inv_icm20948_sensor_android_2_sensor_type(int sensor) {
     }
 }
 
-ICM_20948_Status_e inv_icm20948_set_gyro_sf(ICM_20948_Device_t* pdev, unsigned char div, int gyro_level) {
+__attribute__((no_sanitize("address"))) ICM_20948_Status_e inv_icm20948_set_gyro_sf(
+        ICM_20948_Device_t* pdev, unsigned char div, int gyro_level) {
     ICM_20948_Status_e result = ICM_20948_Stat_Ok;
 
     if (pdev->_dmp_firmware_available == false)
